@@ -3,6 +3,7 @@ import {useForm} from "react-hook-form";
 import {joiResolver} from "@hookform/resolvers/joi";
 import {registerValidator} from "../../validators";
 import {authService} from "../../services";
+import {useNavigate} from "react-router-dom";
 
 const RegisterForm = () => {
 
@@ -11,14 +12,18 @@ const RegisterForm = () => {
 
 
 
-    const {register, reset, handleSubmit, formState: {errors, isValid}} = useForm({
+    const {register, handleSubmit, formState: {errors, isValid}} = useForm({
         mode: 'all',
         resolver: joiResolver(registerValidator)
     })
 
+
+    const navigate = useNavigate();
+
     const save = async (user) => {
         try {
             await authService.register(user)
+            navigate('/login')
         } catch (e) {
             setError(true)
         }
@@ -36,7 +41,7 @@ const RegisterForm = () => {
                 {errors.password&&<div>{errors.password.message}</div>}
                 <div>ConfirmPassword: <input type="text" {...register('re_password')}/></div>
                 {errors.re_password&&<div>{errors.re_password.message}</div>}
-                <button>Register</button>
+                <button disabled={!isValid}>Register</button>
             </form>
         </div>
     );
